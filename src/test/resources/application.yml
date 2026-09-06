@@ -1,0 +1,22 @@
+# Test configuration. Shadows src/main/resources/application.yml on the test classpath so
+# the suite never reads (or leaks) the real API key and never reaches the network.
+server:
+  port: 0
+
+spring:
+  ai:
+    mcp:
+      server:
+        name: youtube-mcp-server
+        version: 0.1.0
+        protocol: STREAMABLE
+        stdio: false
+
+youtube:
+  api:
+    key: test-api-key
+    base-url: https://www.googleapis.com/youtube/v3
+
+logging:
+  level:
+    com.dev.turkim.youtubemcp: INFO

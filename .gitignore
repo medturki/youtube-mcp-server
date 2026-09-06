@@ -1,0 +1,25 @@
+# Build output
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse / VS Code
+.classpath
+.project
+.settings/
+.vscode/
+
+# Local secrets — never commit
+application-local.yml
+application-local.properties
+.env
+
+# OS noise
+.DS_Store
+Thumbs.db
