@@ -139,6 +139,47 @@ spring:
               url: http://localhost:8080
 ```
 
+### 5. Expose it to Claude Desktop with a tunnel
+
+Claude's **custom connectors** cannot reach `localhost`. Even though Claude Desktop runs on
+your machine, remote connectors are configured and brokered through your Claude account, so
+the connection to your MCP server originates from Anthropic's servers rather than from your
+local network interface. `http://localhost:8080/mcp` is therefore unreachable, and the URL
+you register must be public HTTPS.
+
+If you would rather avoid a tunnel entirely, use the **STDIO** setup in step 3 instead:
+Claude Desktop launches the jar as a subprocess and no networking is involved.
+
+Start the server, then open a tunnel to port 8080:
+
+```bash
+# ngrok
+ngrok http 8080
+
+# or Cloudflare Tunnel (no account needed for a quick tunnel)
+cloudflared tunnel --url http://localhost:8080
+```
+
+Either prints a public HTTPS URL such as `https://a1b2-c3d4.ngrok-free.app`. Your MCP
+endpoint is that URL with `/mcp` appended.
+
+Then in Claude, go to **Customize → Connectors → Add custom connector** and enter:
+
+```
+https://<your-tunnel-host>/mcp
+```
+
+Claude infers the transport from the URL — a path ending in `/mcp` uses streamable HTTP,
+which is what `protocol: STREAMABLE` in `application.yml` serves (a URL ending in `/sse`
+would select the older SSE transport instead). Set **Authentication** to **None**, since
+this server implements no OAuth flow.
+
+> **Security note.** A tunnel makes your server reachable by anyone who has the URL, and
+> with authentication set to None there is nothing to stop them calling it. Every request
+> spends your YouTube API quota. Free ngrok and Cloudflare quick-tunnel hostnames are
+> random and short-lived, which is obscurity rather than security. Keep the tunnel running
+> only while you are actually using it, and stop it (Ctrl-C) when you are done.
+
 ## Tests
 
 ```bash
@@ -160,7 +201,7 @@ with a dummy key so the suite never reads or needs a real one.
 ## Project layout
 
 ```
-src/main/java/com/example/youtubemcp/
+src/main/java/com/dev/turkim/youtubemcp/
 ├── YoutubeMcpServerApplication.java   # entry point
 ├── client/
 │   └── YoutubeApiClient.java          # the only class that knows YouTube API endpoints
